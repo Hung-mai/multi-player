@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     public float mouseSensitivity = 2f;
     private float verticalRotateStore;
     private Vector2 mouseInput;
+    public bool invertLook;
+    
 
     private void Awake()
     {
@@ -20,7 +22,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -29,10 +31,18 @@ public class PlayerController : MonoBehaviour
 
         _transform.rotation = Quaternion.Euler(_transform.eulerAngles.x, _transform.eulerAngles.y + mouseInput.x, _transform.eulerAngles.z);
 
-        verticalRotateStore -= mouseInput.y;
+        verticalRotateStore += mouseInput.y;
 
         verticalRotateStore = Mathf.Clamp(verticalRotateStore, -60f, 60f);
 
-        viewPoint.rotation = Quaternion.Euler(verticalRotateStore, viewPoint.eulerAngles.y, viewPoint.eulerAngles.z);
+        if(invertLook)
+        {
+            viewPoint.rotation = Quaternion.Euler(verticalRotateStore, viewPoint.eulerAngles.y, viewPoint.eulerAngles.z);
+        }
+        else
+        {
+            viewPoint.rotation = Quaternion.Euler(-verticalRotateStore, viewPoint.eulerAngles.y, viewPoint.eulerAngles.z);
+        }
     }
+
 }
