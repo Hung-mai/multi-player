@@ -35,6 +35,18 @@ public class PlayerController : MonoBehaviour
     public LayerMask groundLayer;
     
     public Transform bulletImpact;
+    public float timeBetweenShots = 0.1f;
+    private float shotCounter;
+
+    public float maxHeat = 10f;
+    public float heatPerShot = 1f;
+    public float coolRate = 4f;
+    public float overHeatCoolRate = 5f;
+    private float heatCounter;
+    private bool overHeated;
+
+    public List<Gun> guns;
+    private int selectedGunIndex;
 
     private void Awake()
     {
@@ -46,6 +58,9 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         cam = Camera.main;
         camTransform = cam.transform;
+
+        selectedGunIndex = 0;
+        ChooseGun();
     }
 
     void Update()
@@ -102,11 +117,58 @@ public class PlayerController : MonoBehaviour
         movement.y +=  Physics.gravity.y * Time.deltaTime * gravityMod;
         controller.Move(movement * Time.deltaTime);
 
-
-        if(Input.GetMouseButtonDown(0))
+        if(!overHeated)
         {
-            Shoot();
+            if(Input.GetMouseButtonDown(0))
+            {
+                Shoot();
+                shotCounter = guns[selectedGunIndex].timeBetweenShots;
+            }
+            if(Input.GetMouseButton(0) && guns[selectedGunIndex].isAutomatic)
+            {
+                shotCounter -= Time.deltaTime;
+                if(shotCounter <= 0)
+                {
+                    Shoot();
+                    shotCounter = guns[selectedGunIndex].timeBetweenShots;
+                }
+            }
+
+            
+            heatCounter -= coolRate * Time.deltaTime;
         }
+        else
+        {
+            heatCounter -= overHeatCoolRate * Time.deltaTime;
+            if(heatCounter <= 0)
+            {
+                overHeated = false;
+                UIController.ins.overHeatedMessage.gameObject.SetActive(false);
+            }
+        }
+
+        if(heatCounter < 0)
+        {
+            heatCounter = 0;
+        }
+
+        if(Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            selectedGunIndex = 0;
+            ChooseGun();
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            selectedGunIndex = 1;
+            ChooseGun();
+        }
+        else if(Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            selectedGunIndex = 2;
+            ChooseGun();
+        }
+
+
 
 
         if(Input.GetKeyDown(KeyCode.Escape))
@@ -122,6 +184,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void ChooseGun()
+    {
+        for (int i = 0; i < guns.Count; i++)
+        {
+            guns[i].gameObject.SetActive(false);
+        }
+        guns[selectedGunIndex].gameObject.SetActive(true);
+
+
+    }
+
     private void Shoot()
     {
         Ray ray = cam.ViewportPointToRay(new Vector3(.5f, .5f, 0f));
@@ -133,6 +206,15 @@ public class PlayerController : MonoBehaviour
 
             Transform obj = Instantiate(bulletImpact, hit.point, Quaternion.LookRotation(hit.normal, Vector3.up));
             Destroy(obj.gameObject, 10f);
+        }
+
+        heatCounter += guns[selectedGunIndex].heatPerShot;
+        if(heatCounter >= maxHeat)
+        {
+            heatCounter = maxHeat;
+            overHeated = true;
+
+            UIController.ins.overHeatedMessage.gameObject.SetActive(true);
         }
     }
 
