@@ -61,6 +61,10 @@ public class PlayerController : MonoBehaviour
 
         selectedGunIndex = 0;
         ChooseGun();
+
+        Transform newPos = SpawnManager.ins.GetSpawnPoint();
+        _transform.position = newPos.position;
+        _transform.rotation = newPos.rotation;
     }
 
     void Update()
