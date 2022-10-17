@@ -840,6 +840,11 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2546795455607249330, guid: 2150a3818dfeedd4bb1da92ed88f2c33, type: 3}
   m_PrefabInstance: {fileID: 231977767}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &231977769 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5821790429451910343, guid: 2150a3818dfeedd4bb1da92ed88f2c33, type: 3}
+  m_PrefabInstance: {fileID: 231977767}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &242136908
 GameObject:
   m_ObjectHideFlags: 0
@@ -5466,7 +5471,7 @@ MonoBehaviour:
   nameInput: {fileID: 295185896}
   levelToPlay: Map1
   startButton: {fileID: 191190257}
-  roomTestBtn: {fileID: 0}
+  roomTestBtn: {fileID: 231977769}
 --- !u!4 &1933898775
 Transform:
   m_ObjectHideFlags: 0

@@ -13,6 +13,7 @@ public class PlayerSpawner : MonoBehaviour
     }
 
     public GameObject playerPrefab;
+    public GameObject player;
 
     public void Start()
     {
@@ -26,6 +27,6 @@ public class PlayerSpawner : MonoBehaviour
     {
         Transform spawnPoint = SpawnManager.ins.GetSpawnPoint();
 
-        PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint.position, spawnPoint.rotation);
+        player = PhotonNetwork.Instantiate(playerPrefab.name, spawnPoint.position, spawnPoint.rotation);
     }
 }

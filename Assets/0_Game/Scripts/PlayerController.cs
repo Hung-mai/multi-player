@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPunCallbacks
 {
     // --- constants
     private const string MouseX = "Mouse X";
@@ -48,6 +49,8 @@ public class PlayerController : MonoBehaviour
     public List<Gun> guns;
     private int selectedGunIndex;
 
+    public GameObject playerHitImpact;
+
     private void Awake()
     {
         _transform = transform;
@@ -69,6 +72,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if(!photonView.IsMine) return;
         mouseInput = new Vector2(Input.GetAxisRaw(MouseX), Input.GetAxisRaw(MouseY)) * mouseSensitivity;
 
         _transform.rotation = Quaternion.Euler(_transform.eulerAngles.x, _transform.eulerAngles.y + mouseInput.x, _transform.eulerAngles.z);
@@ -206,10 +210,15 @@ public class PlayerController : MonoBehaviour
 
         if(Physics.Raycast(ray,out RaycastHit hit))
         {
-            Debug.Log(hit.collider.gameObject.name);
-
-            Transform obj = Instantiate(bulletImpact, hit.point, Quaternion.LookRotation(hit.normal, Vector3.up));
-            Destroy(obj.gameObject, 10f);
+            if(hit.collider.gameObject.tag == "Player")
+            {
+                PhotonNetwork.Instantiate(playerHitImpact.name, hit.point, Quaternion.identity);
+            }
+            else
+            {
+                Transform obj = Instantiate(bulletImpact, hit.point, Quaternion.LookRotation(hit.normal, Vector3.up));
+                Destroy(obj.gameObject, 10f);
+            }
         }
 
         heatCounter += guns[selectedGunIndex].heatPerShot;
@@ -224,7 +233,10 @@ public class PlayerController : MonoBehaviour
 
     private void LateUpdate()
     {
-        camTransform.position = viewPoint.position;
-        camTransform.rotation = viewPoint.rotation;
+        if(photonView.IsMine)
+        {
+            camTransform.position = viewPoint.position;
+            camTransform.rotation = viewPoint.rotation;
+        }
     }
 }
